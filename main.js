@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCanvas();
     setupEventListeners();
     setupMobileControls();
+    setupResponsiveCanvas();
     
     console.log('🎉 Meme Generator initialized successfully!');
 });
@@ -110,13 +111,16 @@ function initializeElements() {
 }
 
 /**
- * Initialize Fabric.js canvas with default settings
+ * Initialize Fabric.js canvas with responsive dimensions
  */
 function initializeCanvas() {
+    // Get responsive canvas dimensions
+    const { width, height } = getResponsiveCanvasDimensions();
+    
     // Create new Fabric.js canvas instance
     canvas = new fabric.Canvas('memeCanvas', {
-        width: CANVAS_WIDTH,
-        height: CANVAS_HEIGHT,
+        width: width,
+        height: height,
         backgroundColor: '#ffffff',
         selection: true, // Allow object selection
         preserveObjectStacking: true // Maintain layer order
@@ -136,18 +140,134 @@ function initializeCanvas() {
     // Save initial state for undo/redo
     saveCanvasState();
     
-    console.log('Canvas initialized with dimensions:', CANVAS_WIDTH, 'x', CANVAS_HEIGHT);
+    console.log('Canvas initialized with dimensions:', width, 'x', height);
+}
+
+/**
+ * Get responsive canvas dimensions based on screen size
+ */
+function getResponsiveCanvasDimensions() {
+    const isMobile = window.innerWidth <= 991;
+    
+    if (isMobile) {
+        const canvasWrapper = document.getElementById('canvasWrapper');
+        if (canvasWrapper) {
+            const rect = canvasWrapper.getBoundingClientRect();
+            const availableWidth = rect.width - 32; // Account for padding
+            const availableHeight = rect.height - 32; // Account for padding
+            
+            // Maintain 4:3 aspect ratio but fit in available space
+            const aspectRatio = 4 / 3;
+            let width, height;
+            
+            if (availableWidth / availableHeight > aspectRatio) {
+                height = availableHeight;
+                width = height * aspectRatio;
+            } else {
+                width = availableWidth;
+                height = width / aspectRatio;
+            }
+            
+            return {
+                width: Math.max(300, Math.floor(width)),
+                height: Math.max(225, Math.floor(height))
+            };
+        }
+    }
+    
+    // Desktop dimensions
+    return {
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT
+    };
+}
+
+/**
+ * Setup responsive canvas behavior
+ */
+function setupResponsiveCanvas() {
+    let resizeTimeout;
+    
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const { width, height } = getResponsiveCanvasDimensions();
+            
+            if (canvas.width !== width || canvas.height !== height) {
+                canvas.setDimensions({ width, height });
+                
+                // Reposition text objects for new dimensions
+                updateTextPositionsForNewCanvas(width, height);
+                
+                // Rescale background image if exists
+                if (backgroundImage) {
+                    rescaleBackgroundImage(width, height);
+                }
+                
+                canvas.renderAll();
+                console.log('Canvas resized to:', width, 'x', height);
+            }
+        }, 250);
+    });
+}
+
+/**
+ * Update text positions when canvas size changes
+ */
+function updateTextPositionsForNewCanvas(width, height) {
+    if (topTextBox) {
+        topTextBox.set({
+            left: width / 2,
+            top: height * 0.05,
+            width: width * 0.9
+        });
+    }
+    
+    if (bottomTextBox) {
+        bottomTextBox.set({
+            left: width / 2,
+            top: height * 0.85,
+            width: width * 0.9
+        });
+    }
+}
+
+/**
+ * Rescale background image for new canvas dimensions
+ */
+function rescaleBackgroundImage(canvasWidth, canvasHeight) {
+    if (!backgroundImage) return;
+    
+    const scaleX = canvasWidth / backgroundImage.width;
+    const scaleY = canvasHeight / backgroundImage.height;
+    const scale = Math.min(scaleX, scaleY);
+    
+    const finalWidth = backgroundImage.width * scale;
+    const finalHeight = backgroundImage.height * scale;
+    
+    const offsetX = (canvasWidth - finalWidth) / 2;
+    const offsetY = (canvasHeight - finalHeight) / 2;
+    
+    backgroundImage.set({
+        left: offsetX,
+        top: offsetY,
+        scaleX: scale,
+        scaleY: scale
+    });
 }
 
 /**
  * Create the default top and bottom text objects
  */
 function createDefaultTextObjects() {
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    
     // Top text - positioned at 5% from top, centered
     topTextBox = new fabric.Textbox('', {
-        left: CANVAS_WIDTH / 2,
-        top: CANVAS_HEIGHT * 0.05,
-        width: CANVAS_WIDTH * 0.9,
+        left: canvasWidth / 2,
+        top: canvasHeight * 0.05,
+        width: canvasWidth * 0.9,
         fontFamily: 'Impact',
         fontSize: DEFAULT_FONT_SIZE,
         fill: DEFAULT_TEXT_COLOR,
@@ -165,9 +285,9 @@ function createDefaultTextObjects() {
     
     // Bottom text - positioned at 85% from top, centered
     bottomTextBox = new fabric.Textbox('', {
-        left: CANVAS_WIDTH / 2,
-        top: CANVAS_HEIGHT * 0.85,
-        width: CANVAS_WIDTH * 0.9,
+        left: canvasWidth / 2,
+        top: canvasHeight * 0.85,
+        width: canvasWidth * 0.9,
         fontFamily: 'Impact',
         fontSize: DEFAULT_FONT_SIZE,
         fill: DEFAULT_TEXT_COLOR,
@@ -602,7 +722,7 @@ function isValidImageFile(file) {
 }
 
 /**
- * Load image file to canvas as background
+ * Load image file to canvas as background with improved scaling
  */
 function loadImageToCanvas(file) {
     const reader = new FileReader();
@@ -615,18 +735,22 @@ function loadImageToCanvas(file) {
                     canvas.remove(backgroundImage);
                 }
                 
-                // Calculate scaling to fit within canvas while preserving aspect ratio
-                const scaleX = CANVAS_WIDTH / img.width;
-                const scaleY = CANVAS_HEIGHT / img.height;
-                const scale = Math.min(scaleX, scaleY);
+                // Get current canvas dimensions
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                
+                // Calculate scaling to fill the canvas completely
+                const scaleX = canvasWidth / img.width;
+                const scaleY = canvasHeight / img.height;
+                const scale = Math.max(scaleX, scaleY); // Use max for fill, min for fit
                 
                 // Calculate final dimensions
                 const finalWidth = img.width * scale;
                 const finalHeight = img.height * scale;
                 
                 // Center the image on the canvas
-                const offsetX = (CANVAS_WIDTH - finalWidth) / 2;
-                const offsetY = (CANVAS_HEIGHT - finalHeight) / 2;
+                const offsetX = (canvasWidth - finalWidth) / 2;
+                const offsetY = (canvasHeight - finalHeight) / 2;
                 
                 // Set image properties
                 img.set({
