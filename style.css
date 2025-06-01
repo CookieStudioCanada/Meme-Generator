@@ -54,38 +54,59 @@ body {
     color: #fff !important;
 }
 
+/* Ensure all text in offcanvas is white */
+.offcanvas-body,
+.offcanvas-body * {
+    color: #fff !important;
+}
+
+#controls-mobile {
+    background-color: #2E2E2E;
+    padding: 1rem;
+}
+
+#controls-mobile h3,
+#controls-mobile label,
+#controls-mobile .form-label,
+#controls-mobile .form-check-label,
+#controls-mobile * {
+    color: #fff !important;
+}
+
 /* Canvas area improvements for mobile */
 .canvas-area {
     height: 100vh;
     /* Account for safe areas on mobile */
     height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    background-color: #222;
 }
 
-/* Canvas Wrapper: Flexible container for the main meme canvas */
-#canvasWrapper {
-    background-color: #333;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Ensure the flex container for canvas positioning works correctly */
+.canvas-area .flex-fill {
+    position: relative;
 }
 
-/* Meme Canvas: Centered canvas with white background and dotted border */
-#memeCanvas {
+/* Meme Canvas: Direct styling without wrapper */
+#memeCanvas.meme-canvas {
     border: 2px dashed #666;
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    max-width: 100%;
-    max-height: 100%;
+    max-width: calc(100% - 4rem);
+    max-height: calc(100% - 4rem);
+    display: none; /* Hide until image is loaded */
 }
 
-/* Drop Hint Overlay: Shows "drop image here" when no image loaded */
-#dropHint {
+#memeCanvas.meme-canvas.has-image {
+    display: block; /* Show when image is loaded */
+}
+
+/* Drop Hint Overlay: Clean overlay without background wrapper */
+.drop-hint-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 800px;
     height: 600px;
     max-width: calc(100% - 4rem);
@@ -93,7 +114,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     border: 2px dashed #666;
     border-radius: 8px;
     z-index: 10;
@@ -124,9 +145,10 @@ body {
 }
 
 /* Hide drop hint when image is loaded */
-#dropHint.hidden {
+.drop-hint-overlay.hidden {
     opacity: 0;
     pointer-events: none;
+    display: none;
 }
 
 /* Controls Panel: Dark background with Bootstrap integration */
@@ -141,11 +163,6 @@ body {
 #controls .p-3:last-child {
     height: calc(100vh - 60px); /* Subtract header height */
     overflow-y: auto;
-}
-
-#controls-mobile {
-    background-color: #2E2E2E;
-    padding: 1rem;
 }
 
 /* Override Bootstrap form styles for dark theme */
@@ -253,30 +270,21 @@ html, body {
     .canvas-area {
         /* Take full height minus navbar on mobile */
         height: calc(100vh - 56px - env(safe-area-inset-top));
+        position: relative;
     }
     
-    #canvasWrapper {
-        padding: 1rem;
-        /* Make canvas wrapper take full available space */
-        width: calc(100vw - 1rem);
+    #memeCanvas.meme-canvas {
+        /* Canvas should scale to fit the available space on mobile */
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 56px - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+    
+    .drop-hint-overlay {
+        width: calc(100vw - 2rem);
         height: calc(100vh - 56px - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-        min-height: 400px;
-    }
-    
-    #memeCanvas {
-        /* Canvas should scale to fit the wrapper */
-        width: 100% !important;
-        height: 100% !important;
-        max-width: none !important;
-        max-height: none !important;
-        object-fit: contain;
-    }
-    
-    #dropHint {
-        width: 90%;
-        height: 90%;
-        max-width: 90%;
-        max-height: 90%;
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 56px - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 300px;
     }
     
     .drop-emoji {
@@ -289,15 +297,16 @@ html, body {
 }
 
 @media (max-width: 575.98px) {
-    #canvasWrapper {
-        padding: 0.5rem;
-        width: calc(100vw - 0.5rem);
-        height: calc(100vh - 56px - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    #memeCanvas.meme-canvas {
+        max-width: calc(100vw - 1rem);
+        max-height: calc(100vh - 56px - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
     
-    #dropHint {
-        width: 95%;
-        height: 95%;
+    .drop-hint-overlay {
+        width: calc(100vw - 1rem);
+        height: calc(100vh - 56px - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        max-width: calc(100vw - 1rem);
+        max-height: calc(100vh - 56px - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
     
     .drop-emoji {
@@ -317,7 +326,7 @@ html, body {
         display: none !important;
     }
     
-    #dropHint {
+    .drop-hint-overlay {
         display: none !important;
     }
     

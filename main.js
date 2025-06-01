@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupMobileControls();
     setupResponsiveCanvas();
     
-    console.log('🎉 Meme Generator initialized successfully!');
+    console.log('🎉 Meme Creator initialized successfully!');
 });
 
 /**
@@ -126,8 +126,11 @@ function initializeCanvas() {
         preserveObjectStacking: true // Maintain layer order
     });
     
-    // Create default text objects
+    // Create default text objects (hidden initially)
     createDefaultTextObjects();
+    
+    // Hide text boxes initially - they'll show when image is loaded
+    hideTextBoxes();
     
     // Canvas event listeners for object selection
     canvas.on('selection:created', handleObjectSelection);
@@ -144,15 +147,41 @@ function initializeCanvas() {
 }
 
 /**
+ * Hide text boxes until image is loaded
+ */
+function hideTextBoxes() {
+    if (topTextBox) {
+        topTextBox.set('visible', false);
+    }
+    if (bottomTextBox) {
+        bottomTextBox.set('visible', false);
+    }
+    canvas.renderAll();
+}
+
+/**
+ * Show text boxes when image is loaded
+ */
+function showTextBoxes() {
+    if (topTextBox) {
+        topTextBox.set('visible', true);
+    }
+    if (bottomTextBox) {
+        bottomTextBox.set('visible', true);
+    }
+    canvas.renderAll();
+}
+
+/**
  * Get responsive canvas dimensions based on screen size
  */
 function getResponsiveCanvasDimensions() {
     const isMobile = window.innerWidth <= 991;
     
     if (isMobile) {
-        const canvasWrapper = document.getElementById('canvasWrapper');
-        if (canvasWrapper) {
-            const rect = canvasWrapper.getBoundingClientRect();
+        const canvasArea = document.querySelector('.canvas-area .flex-fill');
+        if (canvasArea) {
+            const rect = canvasArea.getBoundingClientRect();
             const availableWidth = rect.width - 32; // Account for padding
             const availableHeight = rect.height - 32; // Account for padding
             
@@ -280,7 +309,8 @@ function createDefaultTextObjects() {
         editable: true,
         hasControls: true,
         hasBorders: true,
-        lockUniScaling: true // Maintain aspect ratio when scaling
+        lockUniScaling: true, // Maintain aspect ratio when scaling
+        visible: false // Hidden initially
     });
     
     // Bottom text - positioned at 85% from top, centered
@@ -300,7 +330,8 @@ function createDefaultTextObjects() {
         editable: true,
         hasControls: true,
         hasBorders: true,
-        lockUniScaling: true
+        lockUniScaling: true,
+        visible: false // Hidden initially
     });
     
     // Add text objects to canvas
@@ -310,11 +341,7 @@ function createDefaultTextObjects() {
     // Track all text boxes
     allTextBoxes = [topTextBox, bottomTextBox];
     
-    // Set top text as initially selected
-    canvas.setActiveObject(topTextBox);
-    currentSelectedText = topTextBox;
-    
-    console.log('Default text objects created');
+    console.log('Default text objects created (hidden until image loaded)');
 }
 
 /**
@@ -453,12 +480,12 @@ function setupEventListeners() {
     elements.imageInput.addEventListener('change', handleImageUpload);
     elements.dropHint.addEventListener('click', () => elements.imageInput.click());
     
-    // Drag and drop on canvas wrapper
-    const canvasWrapper = document.getElementById('canvasWrapper');
-    canvasWrapper.addEventListener('dragover', handleDragOver);
-    canvasWrapper.addEventListener('drop', handleImageDrop);
-    canvasWrapper.addEventListener('dragenter', handleDragEnter);
-    canvasWrapper.addEventListener('dragleave', handleDragLeave);
+    // Drag and drop on canvas area
+    const canvasArea = document.querySelector('.canvas-area');
+    canvasArea.addEventListener('dragover', handleDragOver);
+    canvasArea.addEventListener('drop', handleImageDrop);
+    canvasArea.addEventListener('dragenter', handleDragEnter);
+    canvasArea.addEventListener('dragleave', handleDragLeave);
     
     // Text input live binding - convert to uppercase automatically
     elements.topTextInput.addEventListener('input', function() {
@@ -767,8 +794,19 @@ function loadImageToCanvas(file) {
                 canvas.sendToBack(img);
                 backgroundImage = img;
                 
-                // Hide drop hint and enable download button
+                // Show canvas and hide drop hint
+                elements.canvas.classList.add('has-image');
                 elements.dropHint.classList.add('hidden');
+                
+                // Show text boxes now that image is loaded
+                showTextBoxes();
+                
+                // Set top text as initially selected
+                canvas.setActiveObject(topTextBox);
+                currentSelectedText = topTextBox;
+                updateControlsForSelection();
+                
+                // Enable download button
                 elements.downloadBtn.disabled = false;
                 
                 // Enable mobile download button too
@@ -896,6 +934,12 @@ function downloadMeme() {
  * Add a new text box to the canvas
  */
 function addNewTextBox() {
+    // Only allow adding text if image is loaded
+    if (!backgroundImage) {
+        console.warn('Please add an image first');
+        return;
+    }
+    
     const newTextBox = new fabric.Textbox('NEW TEXT', {
         left: canvas.width / 2,
         top: canvas.height / 2,
@@ -912,7 +956,8 @@ function addNewTextBox() {
         editable: true,
         hasControls: true,
         hasBorders: true,
-        lockUniScaling: true
+        lockUniScaling: true,
+        visible: true // Always visible for new text boxes
     });
     
     canvas.add(newTextBox);

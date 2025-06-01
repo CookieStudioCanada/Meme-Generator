@@ -4,7 +4,7 @@
     <!-- Standard meta tags for responsive design and character encoding -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Meme Generator - Create Memes Instantly!</title>
+    <title>Meme Creator - Create Memes Instantly!</title>
     
     <!-- PWA theme color for status bar -->
     <meta name="theme-color" content="#2E2E2E">
@@ -25,7 +25,7 @@
     <!-- Bootstrap Native Mobile Header with Offcanvas Toggle -->
     <nav class="navbar navbar-dark bg-dark d-lg-none p-2">
         <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Meme Controls</span>
+            <span class="navbar-brand mb-0 h1">Meme Creator</span>
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -35,7 +35,7 @@
     <!-- Bootstrap Native Offcanvas for Mobile Controls -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="mobileOffcanvasLabel">Meme Controls</h5>
+            <h5 class="offcanvas-title" id="mobileOffcanvasLabel">Meme Creator</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body p-0">
@@ -51,23 +51,21 @@
             <!-- Canvas Area -->
             <div class="col-12 col-lg-9 d-flex flex-column canvas-area">
                 <div class="flex-fill d-flex justify-content-center align-items-center p-2">
-                    <div id="canvasWrapper" class="position-relative">
-                        <!-- The main Fabric.js canvas where memes are created -->
-                        <canvas id="memeCanvas"></canvas>
-                        
-                        <!-- Visual hint for drag-and-drop, hidden once image is loaded -->
-                        <div id="dropHint" class="position-absolute top-50 start-50 translate-middle">
-                            <div class="drop-content text-center">
-                                <span class="drop-emoji">📥</span>
-                                <p>Drop an image here</p>
-                                <p class="drop-subtext">or click to select</p>
-                            </div>
+                    <!-- The main Fabric.js canvas where memes are created -->
+                    <canvas id="memeCanvas" class="meme-canvas"></canvas>
+                    
+                    <!-- Visual hint for drag-and-drop, shown when no image is loaded -->
+                    <div id="dropHint" class="drop-hint-overlay">
+                        <div class="drop-content text-center">
+                            <span class="drop-emoji">📥</span>
+                            <p>Drop an image here</p>
+                            <p class="drop-subtext">or click to select</p>
                         </div>
-                        
-                        <!-- Hidden file input for traditional file selection -->
-                        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,.gif" 
-                               aria-label="Select image file for meme" hidden>
                     </div>
+                    
+                    <!-- Hidden file input for traditional file selection -->
+                    <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp,.gif" 
+                           aria-label="Select image file for meme" hidden>
                 </div>
             </div>
             
@@ -76,7 +74,7 @@
                 <aside id="controls" class="h-100 overflow-auto">
                     <!-- Header -->
                     <div class="p-3 border-bottom">
-                        <h2 class="h5 mb-0">Meme Controls</h2>
+                        <h2 class="h5 mb-0">Meme Creator</h2>
                     </div>
                     
                     <!-- Controls content -->
