@@ -58,7 +58,11 @@ const elements = {
     resetFiltersBtn: null,
     undoBtn: null,
     redoBtn: null,
-    clearAllBtn: null
+    clearAllBtn: null,
+    // Canvas action elements
+    canvasActions: null,
+    saveBtn: null,
+    shareBtn: null
 };
 
 /**
@@ -108,6 +112,11 @@ function initializeElements() {
     elements.undoBtn = document.getElementById('undoBtn');
     elements.redoBtn = document.getElementById('redoBtn');
     elements.clearAllBtn = document.getElementById('clearAllBtn');
+    
+    // Canvas action elements
+    elements.canvasActions = document.getElementById('canvasActions');
+    elements.saveBtn = document.getElementById('saveBtn');
+    elements.shareBtn = document.getElementById('shareBtn');
 }
 
 /**
@@ -618,6 +627,10 @@ function setupEventListeners() {
     elements.deleteSelectedBtn.addEventListener('click', deleteSelectedObject);
     elements.downloadBtn.addEventListener('click', downloadMeme);
     
+    // Canvas action buttons
+    elements.saveBtn.addEventListener('click', downloadMeme); // Same functionality as download
+    elements.shareBtn.addEventListener('click', shareMeme);
+    
     console.log('Desktop event listeners set up');
 }
 
@@ -798,6 +811,10 @@ function loadImageToCanvas(file) {
                 elements.canvas.classList.add('has-image');
                 elements.dropHint.classList.add('hidden');
                 
+                // Show canvas action buttons
+                elements.canvasActions.classList.remove('d-none');
+                elements.canvasActions.classList.add('d-flex');
+                
                 // Show text boxes now that image is loaded
                 showTextBoxes();
                 
@@ -890,6 +907,62 @@ function deleteSelectedObject() {
     canvas.renderAll();
     
     console.log('Object deleted 🗑️');
+}
+
+/**
+ * Share the meme using the Web Share API
+ */
+async function shareMeme() {
+    if (!backgroundImage) {
+        console.warn('Please add an image first');
+        return;
+    }
+    
+    try {
+        // Check if Web Share API is supported
+        if (!navigator.share) {
+            console.warn('Web Share API not supported. Falling back to download.');
+            downloadMeme();
+            return;
+        }
+        
+        // Deselect all objects for clean export
+        canvas.discardActiveObject();
+        canvas.renderAll();
+        
+        // Convert canvas to blob
+        const dataURL = canvas.toDataURL({
+            format: 'png',
+            quality: 1.0,
+            multiplier: 1
+        });
+        
+        // Convert data URL to blob
+        const response = await fetch(dataURL);
+        const blob = await response.blob();
+        
+        // Create a file from the blob
+        const file = new File([blob], 'meme.png', { type: 'image/png' });
+        
+        // Use Web Share API to share
+        await navigator.share({
+            title: 'Check out my meme!',
+            text: 'I created this meme with Meme Creator',
+            files: [file]
+        });
+        
+        console.log('Meme shared successfully! 📤');
+        
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.log('Share was cancelled by user');
+        } else {
+            console.error('Error sharing meme:', error);
+            // Fallback to download if share fails
+            console.log('Falling back to download...');
+            downloadMeme();
+        }
+    }
 }
 
 /**

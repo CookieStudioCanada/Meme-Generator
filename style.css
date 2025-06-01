@@ -316,6 +316,16 @@ html, body {
     .drop-content p {
         font-size: 0.9rem;
     }
+    
+    /* Stack buttons vertically on very small screens */
+    #canvasActions {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    #canvasActions .btn {
+        min-width: 200px;
+    }
 }
 
 /* Print styles */
@@ -352,4 +362,36 @@ input:focus,
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* Canvas action buttons below the canvas */
+#canvasActions {
+    background-color: #2E2E2E;
+    border-top: 1px solid #444;
+}
+
+#canvasActions.d-flex {
+    display: flex !important;
+}
+
+#canvasActions .btn {
+    min-width: 120px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#canvasActions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile Controls button styling */
+#mobileControlsBtn {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+#mobileControlsBtn:hover {
+    background-color: #5a6268 !important;
+    border-color: #545b62 !important;
 } 
