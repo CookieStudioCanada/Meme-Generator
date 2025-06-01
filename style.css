@@ -1,0 +1,309 @@
+/* 
+ * MEME GENERATOR STYLES
+ * Dark theme with Bootstrap integration using native components
+ */
+
+/* CSS Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body: Dark background with Impact font as fallback */
+body {
+    font-family: 'Impact', Arial, sans-serif;
+    background-color: #222 !important;
+    color: #fff !important;
+    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Bootstrap overrides for dark theme */
+.bg-dark {
+    background-color: #2E2E2E !important;
+}
+
+.navbar-dark .navbar-brand {
+    color: #fff !important;
+}
+
+.offcanvas {
+    background-color: #2E2E2E !important;
+    border-right: 1px solid #444;
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid #444;
+}
+
+.offcanvas-title {
+    color: #fff !important;
+}
+
+/* Canvas Wrapper: Flexible container for the main meme canvas */
+#canvasWrapper {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Meme Canvas: Centered canvas with white background and dotted border */
+#memeCanvas {
+    border: 2px dashed #666;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Drop Hint Overlay: Shows "drop image here" when no image loaded */
+#dropHint {
+    width: 800px;
+    height: 600px;
+    max-width: calc(100% - 4rem);
+    max-height: calc(100% - 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px dashed #666;
+    border-radius: 8px;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+/* Drop hint content styling */
+.drop-content {
+    pointer-events: none;
+}
+
+.drop-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.drop-content p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.drop-subtext {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Hide drop hint when image is loaded */
+#dropHint.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Controls Panel: Dark background with Bootstrap integration */
+#controls {
+    background-color: #2E2E2E;
+    border-left: 1px solid #444;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Controls content area */
+#controls .p-3:last-child {
+    height: calc(100vh - 60px); /* Subtract header height */
+    overflow-y: auto;
+}
+
+#controls-mobile {
+    background-color: #2E2E2E;
+    padding: 1rem;
+}
+
+/* Override Bootstrap form styles for dark theme */
+.form-label {
+    color: #ccc !important;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    background-color: #1a1a1a !important;
+    border: 1px solid #444 !important;
+    color: #fff !important;
+}
+
+.form-control:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+}
+
+.form-control::placeholder {
+    color: #666 !important;
+}
+
+/* Form Range (Sliders) */
+.form-range {
+    background: transparent !important;
+}
+
+.form-range::-webkit-slider-track {
+    background: #444 !important;
+    height: 8px;
+    border-radius: 4px;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: #007bff !important;
+    border: none !important;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.form-range::-moz-range-track {
+    background: #444 !important;
+    height: 8px;
+    border-radius: 4px;
+}
+
+.form-range::-moz-range-thumb {
+    background: #007bff !important;
+    border: none !important;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+/* Color inputs */
+.form-control-color {
+    width: 100% !important;
+    height: 40px !important;
+    background-color: #1a1a1a !important;
+    border: 1px solid #444 !important;
+}
+
+/* Checkboxes */
+.form-check-input {
+    background-color: #1a1a1a !important;
+    border: 1px solid #444 !important;
+}
+
+.form-check-input:checked {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+.form-check-label {
+    color: #ccc !important;
+}
+
+/* Button overrides */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+}
+
+/* Responsive canvas sizing */
+@media (max-width: 991.98px) {
+    body {
+        overflow-y: auto;
+    }
+    
+    #canvasWrapper {
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 100px);
+        padding: 1rem;
+    }
+    
+    #memeCanvas {
+        max-width: calc(100vw - 4rem);
+        max-height: calc(100vh - 140px);
+    }
+    
+    #dropHint {
+        width: 250px;
+        height: 190px;
+        max-width: calc(100vw - 4rem);
+        max-height: calc(100vh - 140px);
+    }
+    
+    .drop-emoji {
+        font-size: 2rem;
+    }
+    
+    .drop-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    #canvasWrapper {
+        padding: 0.5rem;
+    }
+    
+    #memeCanvas {
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 120px);
+    }
+    
+    #dropHint {
+        width: 200px;
+        height: 150px;
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 120px);
+    }
+    
+    .drop-emoji {
+        font-size: 1.5rem;
+    }
+    
+    .drop-content p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .offcanvas,
+    #controls {
+        display: none !important;
+    }
+    
+    #dropHint {
+        display: none !important;
+    }
+    
+    body {
+        overflow: visible;
+    }
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+.btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+} 
